@@ -1,0 +1,13 @@
+{
+  "name": "n8n-s3-deleteobjects-checksum",
+  "version": "1.0.0",
+  "private": true,
+  "description": "What n8n's bundled AWS SDK sends on S3 DeleteObjects (CRC32 or Content-MD5) with and without AWS_REQUEST_CHECKSUM_CALCULATION, measured inside the n8n 2.45.6 image against a recording S3 stand-in",
+  "license": "MIT",
+  "scripts": {
+    "test:e2e": "node scripts/e2e.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

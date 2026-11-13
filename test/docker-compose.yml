@@ -1,0 +1,7 @@
+# Overlay for the end-to-end tests. Paths are relative to the repository root.
+#   npm run test:e2e
+services:
+  standin:
+    mem_limit: 256m
+  lab:
+    mem_limit: 1500m
