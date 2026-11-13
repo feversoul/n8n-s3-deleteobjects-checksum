@@ -12,7 +12,7 @@
 // Every other bucket accepts whatever is sent.
 //
 // Lab endpoints (not S3): GET /_lab/health, POST /_lab/case {name},
-// POST /_lab/result {...}, POST /_lab/done, GET /_lab/report, POST /_lab/reset.
+// POST /_lab/result {...}, POST /_lab/done, GET /_lab/report, GET /_lab/count?case=, POST /_lab/reset.
 
 import { createHash, createHmac } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -152,6 +152,7 @@ function handleLab(req, res, url, body) {
     done = false;
     return send(200, { ok: true });
   }
+  if (route === 'GET /_lab/count') return send(200, { count: requests.filter((r) => r.case === url.searchParams.get('case')).length });
   if (route === 'GET /_lab/report') return send(200, { done, results, requests });
   return send(404, { error: 'unknown lab endpoint' });
 }

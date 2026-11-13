@@ -58,7 +58,7 @@ function n8nRefusal(env) {
 }
 
 // Starts the real n8n (default storage, no licence) with the preload file and
-// waits until it answers on /healthz.
+// waits until it answers on /healthz and has made its own call to the bucket.
 async function n8nStartsWithPreload() {
   const child = spawn('n8n', ['start'], { env: { ...process.env, NODE_OPTIONS: PRELOAD, MD5_PRELOAD_DEBUG: '1', N8N_PORT: '5678' } });
   let output = '';
@@ -71,10 +71,19 @@ async function n8nStartsWithPreload() {
     healthy = await fetch('http://127.0.0.1:5678/healthz').then((r) => r.status === 200, () => false);
     if (!healthy) await sleep(500);
   }
+  // n8n answers on /healthz before it has finished starting. Its connection
+  // check on the bucket (HeadBucket) comes later in the start, so wait for it
+  // to arrive at the stand-in before stopping n8n.
+  let callsSeen = 0;
+  for (let i = 0; i < 240 && healthy && exited === null && callsSeen === 0; i++) {
+    callsSeen = await fetch(`${STANDIN}/_lab/count?case=n8n`, { headers: { connection: 'close' } }).then((r) => r.json(), () => ({ count: 0 })).then((body) => body.count);
+    if (callsSeen === 0) await sleep(500);
+  }
   child.kill('SIGTERM');
   for (let i = 0; i < 40 && exited === null; i++) await sleep(500);
   if (exited === null) child.kill('SIGKILL');
-  return { healthy, preloadLines: output.split('\n').filter((line) => line.includes('md5-preload')) };
+  const lines = output.split('\n');
+  return { healthy, callsSeen, preloadLines: lines.filter((line) => line.includes('md5-preload')), lastLines: lines.filter(Boolean).slice(-15) };
 }
 
 (async () => {

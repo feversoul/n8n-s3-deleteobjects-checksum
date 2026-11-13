@@ -200,7 +200,7 @@ test('n8n starts with the preload file and its own HeadBucket goes through the s
   assert.equal(start.healthy, true);
   assert.ok(start.preloadLines.some((line) => line.includes('S3Client.send wrapped')));
   const fromN8n = report.requests.filter((r) => r.case === 'n8n');
-  assert.ok(fromN8n.length >= 1, 'the n8n process itself called the stand-in');
+  assert.ok(fromN8n.length >= 1, `the n8n process itself called the stand-in; its last output:\n${(start.lastLines ?? []).join('\n')}`);
   assert.ok(fromN8n.every((r) => r.op === 'HeadBucket' && r.status === 200));
 });
 
