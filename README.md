@@ -92,7 +92,7 @@ AWS documents the setting the same way: with `WHEN_REQUIRED` a checksum is still
 3. Set `MD5_PRELOAD_DEBUG=1` once and look for `md5-preload: S3Client.send wrapped` in the log. Then remove it.
 4. Drop `AWS_REQUEST_CHECKSUM_CALCULATION` again unless you need it for another reason. It does not help this call.
 
-Know what this is. It is not an n8n setting and n8n does not support it. It leans on internals: the package layout in the image and the SDK's middleware name. Check it again after every n8n upgrade; if the SDK cannot be found the file does nothing and the delete fails as before. The build-time patch from the thread does the same job from inside n8n and was confirmed by its author against a real Dell ECS. The preload was not.
+Know what this is. It is not an n8n setting and n8n does not support it. `NODE_OPTIONS` applies to every Node process started in the container, not only to n8n, and Node refuses to start when the file is not at that path, so a wrong mount stops n8n. It leans on internals: the package layout in the image and the SDK's middleware name. Check it again after every n8n upgrade; if the SDK cannot be found the file does nothing and the delete fails as before. The build-time patch from the thread does the same job from inside n8n and was confirmed by its author against a real Dell ECS. The preload was not.
 
 Not on n8n Cloud: it needs control over the container.
 
